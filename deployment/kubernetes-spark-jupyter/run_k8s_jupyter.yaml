@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jupyter-pod
+  labels:
+    app: jupyter-pod
+spec:
+  volumes:
+  - name: host-mount
+    hostPath:
+      path: "/host"
+  containers:
+  serviceAccountName: spark-driver
+  containers:
+  - name: jupyter-pod
+    image: spark-k8s-jupyter
+    imagePullPolicy: Never
+    command: ["jupyter", "lab", "--ip", "0.0.0.0", "--port", "9000"]
+    tty: true
+    stdin: true
+    ports:
+      - containerPort: 9000
+    volumeMounts:
+    - mountPath: "/home/kruger/work"
+      name: host-mount
+  restartPolicy: Always
+  initContainers:
+  - name: nfs-fixer
+    image: spark-k8s-jupyter
+    imagePullPolicy: Never
+    securityContext:
+      runAsUser: 0
+    volumeMounts:
+    - name: host-mount
+      mountPath: /home/kruger/work
+    command:
+    - sh
+    - -c
+    - (chmod 0777 /home/kruger/work; chgrp 777 /home/kruger/work)
+  securityContext:
+    fsGroup: 777
+    runAsUser: 1000
+    runAsGroup: 777
+    fsGroupChangePolicy: "Always"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jupyter-pod
+  name: jupyter-pod-cluster-ip
+  namespace: default
+spec:
+  clusterIP: None
+  clusterIPs:
+  - None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 9000
+    protocol: TCP
+    targetPort: 9000
+  selector:
+    app: jupyter-pod
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jupyter-pod
+  name: jupyter-pod-svc
+  namespace: default
+spec:
+  ports:
+  - port: 9000
+    protocol: TCP
+    targetPort: 9000
+    nodePort: 31200
+  selector:
+    app: jupyter-pod
+  type: NodePort

@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: update-new-games
+spec:
+  schedule: "30 9 * * 3"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: update-new-games
+            image: update_new_games:latest
+            imagePullPolicy: Never
+            command: ["python3"]
+            args: ["update_new_games.py"]
+            env:
+            - name: MONGO_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-creds
+                  key: username
+            - name: MONGO_DB_PASSWORD
+              valueFrom:
+               secretKeyRef:
+                 name: mongo-creds
+                 key: password
+            - name: MONGO_DB_HOST
+              value: mongo-nodeport-svc
+            - name: MONGO_DB_PORT
+              value: "27017"
+          restartPolicy: OnFailure
+

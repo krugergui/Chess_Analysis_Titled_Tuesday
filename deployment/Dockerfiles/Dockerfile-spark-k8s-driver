@@ -1,0 +1,12 @@
+FROM spark-k8s-base:latest
+
+# Install kubectl
+USER root
+RUN apt install -y apt-transport-https apt-utils gnupg curl \
+  && echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /" | tee /etc/apt/sources.list.d/kubernetes.list \
+  && curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg \
+  && apt update \
+  && apt install -y kubectl
+
+# Switch back to Spark USER uid
+USER ${spark_uid}

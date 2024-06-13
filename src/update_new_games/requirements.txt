@@ -1,0 +1,8 @@
+importlib-metadata==7.0.1
+ipykernel==6.29.3
+pandas==2.2.1
+pickleshare==0.7.5
+pymongo==4.6.2
+requests==2.31.0
+tqdm==4.66.2
+typing-extensions==4.10.0

@@ -1,0 +1,38 @@
+FROM spark-k8s-driver
+
+
+# Install Jupyter and Data Science libraries
+USER root
+RUN pip install numpy pandas 
+RUN pip install notedown plotly seaborn matplotlib 
+RUN pip install bokeh xlrd yellowbrick
+RUN pip install scikit-learn scikit-image
+RUN pip install scipy 
+RUN pip install jupyterlab s3contents \
+	&& mkdir -p /home/public && chmod 777 /home/public
+RUN pip install py4j pymongo \
+	&& ln -s /opt/spark/python/pyspark /usr/local/lib/python3.10/dist-packages/pyspark \
+ 	&& ln -s /opt/spark/python/pylintrc /usr/local/lib/python3.10/dist-packages/pylintrc
+
+# JDBC connect for Postgres
+RUN wget https://repo1.maven.org/maven2/org/mongodb/bson/5.0.0/bson-5.0.0.jar -P /opt/spark/jars
+RUN wget https://repo1.maven.org/maven2/org/mongodb/spark/mongo-spark-connector_2.13/10.2.2/mongo-spark-connector_2.13-10.2.2.jar -P /opt/spark/jars
+RUN wget https://repo1.maven.org/maven2/org/mongodb/mongodb-driver/3.8.1/mongodb-driver-3.8.1.jar -P /opt/spark/jars
+RUN wget https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/5.0.0/mongodb-driver-core-5.0.0.jar -P /opt/spark/jars
+RUN wget https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/5.0.0/mongodb-driver-sync-5.0.0.jar -P /opt/spark/jars
+
+# Configure Jupyter User
+ARG NB_USER="kruger"
+ARG NB_UID="1000"
+ARG NB_GROUP="analytics"
+ARG NB_GID="777"
+RUN groupadd -g $NB_GID $NB_GROUP \
+	&& useradd -m -s /bin/bash -N -u $NB_UID -g $NB_GID $NB_USER \
+	&& mkdir -p /home/$NB_USER/work \
+	&& mkdir -p /home/$NB_USER/.jupyter \
+	&& chown -R $NB_USER:$NB_GROUP /home/$NB_USER
+
+
+# Configure Working Directory
+USER $NB_USER
+WORKDIR /home/$NB_USER/work

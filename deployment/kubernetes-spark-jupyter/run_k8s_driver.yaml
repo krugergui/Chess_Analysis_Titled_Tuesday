@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: spark-driver
+  labels:
+    app: spark-driver
+spec:
+  serviceAccountName: spark-driver
+  containers:
+  - name: spark-driver
+    image: spark-k8s-driver
+    imagePullPolicy: Never
+    command: ["/bin/bash"]
+    tty: true
+    stdin: true
+    ports:
+      - containerPort: 20200
+  restartPolicy: Always

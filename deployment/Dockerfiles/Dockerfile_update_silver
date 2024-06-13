@@ -1,0 +1,14 @@
+FROM python:3.10-slim
+
+# Set the current directory inside the container to /app
+WORKDIR /app
+
+# Install dependencies
+COPY src/silver_data_etl/requirements.txt /app
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the necessary files
+COPY src/silver_data_etl/silver_data_loader.py /app
+
+# Set the user to non-root
+USER nobody
