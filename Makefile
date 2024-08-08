@@ -42,4 +42,4 @@ build_all:
 
 setup_kubernetes_cluster:
 		minikube start
-		kubectl apply -f deployment/kubernetes/kubernetes-mongodb
+		kubectl apply -f deployment/kubernetes-mongodb

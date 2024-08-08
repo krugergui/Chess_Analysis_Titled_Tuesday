@@ -4,14 +4,13 @@
 		{"id":"ae58654f75cc57fd","type":"text","text":"MongoDB ","x":-95,"y":140,"width":205,"height":50},
 		{"id":"302ed323847dd825","type":"text","text":"Container for collecting and storing data","x":-840,"y":415,"width":250,"height":50},
 		{"id":"f4084f399aa6fb17","type":"text","text":"Schedules to run from time to time","x":-840,"y":100,"width":253,"height":64,"color":"5"},
-		{"id":"4f1c2166d3a07634","type":"text","text":"PySpark","x":-160,"y":780,"width":250,"height":60},
 		{"id":"022769f48bffcc18","type":"text","text":"Chessnerd PGNs\nhttps://chessnerd.net/pgn/chesscom/titled-tuesday/","x":-1260,"y":415,"width":283,"height":50,"color":"4"},
 		{"id":"c59b53286f62eecc","type":"text","text":"Docker/Kubernetes","x":-840,"y":582,"width":250,"height":60,"color":"5"},
 		{"id":"7da90784d737b18b","type":"text","text":"Kubernetes","x":-95,"y":-80,"width":250,"height":50,"color":"4"},
 		{"id":"130288eeaef53c04","type":"text","text":"Container with transformations","x":-160,"y":582,"width":250,"height":58},
 		{"id":"ff153e0d3cb31e13","type":"text","text":"Transform","x":-140,"y":415,"width":250,"height":50},
 		{"id":"3dba7018389e744d","type":"text","text":"Processed Data\nStructured","x":260,"y":420,"width":250,"height":60},
-		{"id":"7af726a0c72c079a","type":"text","text":"Container with Jupyter Notebook and Pyspark for exploratory analysis and predictive modelling","x":460,"y":642,"width":320,"height":109},
+		{"id":"7af726a0c72c079a","type":"text","text":"Container with Jupyter Notebook for exploratory analysis and predictive modelling","x":460,"y":642,"width":320,"height":109},
 		{"id":"09c557ff3f61a642","type":"text","text":"Container with Dashboard for presentation/reporting","x":840,"y":420,"width":250,"height":50,"color":"1"}
 	],
 	"edges":[
@@ -20,7 +19,6 @@
 		{"id":"dc7be50bcd94e0e4","fromNode":"2b3c8eff9612a9bc","fromSide":"right","toNode":"ff153e0d3cb31e13","toSide":"left"},
 		{"id":"1753b23b76bbc4df","fromNode":"ff153e0d3cb31e13","fromSide":"right","toNode":"3dba7018389e744d","toSide":"left"},
 		{"id":"b230dd4545e40e9e","fromNode":"3dba7018389e744d","fromSide":"top","toNode":"ae58654f75cc57fd","toSide":"right"},
-		{"id":"0c8487749221157f","fromNode":"4f1c2166d3a07634","fromSide":"top","toNode":"130288eeaef53c04","toSide":"bottom"},
 		{"id":"3986393f7c2567fa","fromNode":"130288eeaef53c04","fromSide":"top","toNode":"ff153e0d3cb31e13","toSide":"bottom"},
 		{"id":"e358fd4ae1e0549d","fromNode":"3dba7018389e744d","fromSide":"bottom","toNode":"7af726a0c72c079a","toSide":"left"},
 		{"id":"e9f5f42d5ec30f89","fromNode":"3dba7018389e744d","fromSide":"right","toNode":"09c557ff3f61a642","toSide":"left"},
