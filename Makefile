@@ -1,5 +1,10 @@
+.PHONY: install setup start_minikube build_update_silver_etl build_update_new_games build_spark_base build_spark_driver
+
 install:
 		./install.sh
+
+setup:
+		./setup.sh
 
 start_minikube:
 		@if ! minikube status > /dev/null 2>&1; then \
@@ -39,6 +44,8 @@ build_spark_jupyter:
 build_all:
 		@make build_update_silver_etl
 		@make build_update_new_games
+
+build_spark_jupyter:
 		@make build_spark_base
 		@make build_spark_driver
 		@make build_spark_jupyter

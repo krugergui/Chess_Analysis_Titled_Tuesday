@@ -113,4 +113,6 @@ fi
 
 echo $'\nPrerequisites Fullfiled'
 
+echo $'\nRun "make setup" to setup the environment'
+
 exit 0
