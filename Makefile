@@ -1,3 +1,6 @@
+install:
+		./install.sh
+
 start_minikube:
 		@if ! minikube status > /dev/null 2>&1; then \
 			minikube start; \

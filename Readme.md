@@ -17,6 +17,8 @@ The aim is to develop a full service using micro services (containers) with very
 
 The diagram below show the project structure consisting of many microservices container for the ETL process and a NoSQL Mongo Database.
 
+In red are the areas that are still in development.
+
 ![alt text](doc/images/diagram-export-8-12-2024-10_50_23-PM.png)
 
 Included in this project is a Jupyter Container that creates Spark Slaves and loads the data from the MongoDB container, this was not utilized in the data exploration.
