@@ -56,12 +56,14 @@ echo $'\nFinished updating landing area\n'
 
 # Update silver table
 echo $'\nUpdating silver table\n'
-kubectl create job --from=cronjob/update-silver-games update-silver-games
+kubectl create job --from=cronjob/update-silver-games first-run-update-silver-games
 echo $'\nWaiting for update-silver-games job to be ready\n'
 kubectl wait --for=condition=ready pod -l app=update-silver-games
 kubectl attach -it jobs/update-silver-games
 echo $'\nFinished updating silver table\n'
 
-echo $'\nFinished setup\n'
-echo $'\nThe data can now be accesed in the Mongo DB'
-echo $'\nPlease check the README.md for more information\n'
+echo $'\nFinished setup'
+echo $'The data can now be accesed in the Mongo DB'
+echo 'You can access the Database in the following URL' 
+minikube service mongo-nodeport-svc --url
+echo $´Please check the README.md for more information\n'

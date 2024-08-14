@@ -122,12 +122,13 @@ def parse_landing_area_document(landing_area_document):
             key, value = line.strip(" []").split(" ", 1)
             value = value.strip('"')
             chess_object[key] = value
-        # Otherwise it's a move (hopefully!)
+        # Otherwise it's a move
         else:
             # Make sure we have a moves_with_clock key
             chess_object.setdefault("moves_with_clock", "")
             # Add the move to the moves_with_clock
             chess_object["moves_with_clock"] += line.strip() + "\n"
+
         # If the line ends with a result, means it's the end of the chess object
         if line.endswith("1-0") or line.endswith("0-1") or line.endswith("1/2-1/2"):
             # Extract the time control
@@ -154,7 +155,7 @@ def parse_landing_area_document(landing_area_document):
             }
 
 
-def save_to_silver_database(chess_objects):
+def save_to_silver_games(chess_objects):
     """
     Insert many chess objects into the silver_games collection.
 
@@ -213,7 +214,7 @@ if __name__ == "__main__":
 
             chess_objects.append(chess_object)
 
-        save_to_silver_database(chess_objects)
+        save_to_silver_games(chess_objects)
         save_to_silver_events(chess_objects, results_event)
 
         chess_objects = []
