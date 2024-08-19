@@ -171,30 +171,119 @@ def save_to_silver_games(chess_objects):
 
 
 def save_to_silver_events(chess_objects, results):
-    array_results = []
+    # Calculate Tie Breaks according to Chess.com Swiss Tournaments Rules
+    # https://support.chess.com/en/articles/8572860-how-do-ties-in-tournaments-work
+    dict_tiebreaks = {}
 
-    for player in results:
-        array_results.append({"player": player, "score": results[player]})
+    for game in chess_objects:
+        # Initialize the tiebreaks for each player
+        dict_tiebreaks.setdefault(game["White"], {"player": game["White"]})
+        dict_tiebreaks.setdefault(game["Black"], {"player": game["Black"]})
+        dict_tiebreaks[game["White"]].setdefault("direct_encounters", [])
+        dict_tiebreaks[game["Black"]].setdefault("direct_encounters", [])
 
-    sorted_results = sorted(array_results, key=lambda x: x["score"], reverse=True)
+        # Set the score for each player that didn't won a single game
+        results.setdefault(game["White"], 0)
+        results.setdefault(game["Black"], 0)
 
-    current_score = None
-    position = 1
+        dict_tiebreaks[game["White"]]["direct_encounters"].append(results[game["Black"]])
+        dict_tiebreaks[game["Black"]]["direct_encounters"].append(results[game["White"]])
+
+        # Sonnenborn-Berger, number of wins, number of wins with black and direct encounter wins
+        dict_tiebreaks[game["White"]].setdefault("sonnenborn_berger", 0)
+        dict_tiebreaks[game["Black"]].setdefault("sonnenborn_berger", 0)
+        dict_tiebreaks[game["White"]].setdefault("number_of_wins", 0)
+        dict_tiebreaks[game["Black"]].setdefault("number_of_wins", 0)
+        dict_tiebreaks[game["White"]].setdefault("number_of_wins_with_black", 0)
+        dict_tiebreaks[game["Black"]].setdefault("number_of_wins_with_black", 0)
+        dict_tiebreaks[game["White"]].setdefault("direct_encounter_wins", [])
+        dict_tiebreaks[game["Black"]].setdefault("direct_encounter_wins", [])
+
+        if game["Result"] == "1-0":  # white wins
+            dict_tiebreaks[game["White"]]["sonnenborn_berger"] += results[game["Black"]]
+            dict_tiebreaks[game["White"]]["number_of_wins"] += 1
+            dict_tiebreaks[game["White"]]["direct_encounter_wins"].append(game["Black"])
+        elif game["Result"] == "0-1":  # black wins
+            dict_tiebreaks[game["Black"]]["sonnenborn_berger"] += results[game["White"]]
+            dict_tiebreaks[game["Black"]]["direct_encounter_wins"].append(game["White"])
+            dict_tiebreaks[game["Black"]]["number_of_wins"] += 1
+            dict_tiebreaks[game["Black"]]["number_of_wins_with_black"] += 1
+        elif game["Result"] == "1/2-1/2":  # draw
+            dict_tiebreaks[game["White"]]["sonnenborn_berger"] += 0.5 * results[game["Black"]]
+            dict_tiebreaks[game["Black"]]["sonnenborn_berger"] += 0.5 * results[game["White"]]
+
+        # AROC 1
+        dict_tiebreaks[game["White"]].setdefault("opponet_ratings", [])
+        dict_tiebreaks[game["Black"]].setdefault("opponet_ratings", [])
+
+        # Some games don't have ratings
+        game.setdefault("WhiteElo", 0)
+        game.setdefault("BlackElo", 0)
+        dict_tiebreaks[game["White"]]["opponet_ratings"].append(game["BlackElo"])
+        dict_tiebreaks[game["Black"]]["opponet_ratings"].append(game["WhiteElo"])
+
+        # Own Rating and score
+        dict_tiebreaks[game["White"]]["own_rating"] = game["WhiteElo"]
+        dict_tiebreaks[game["Black"]]["own_rating"] = game["BlackElo"]
+        dict_tiebreaks[game["White"]]["score"] = results[game["White"]]
+        dict_tiebreaks[game["Black"]]["score"] = results[game["Black"]]
+
+    # Buchholz cut 1, Buchholz, AROC 1
+    for player in dict_tiebreaks:
+        # Buchholz cut 1
+        dict_tiebreaks[player]["buchholz_cut_1"] = sorted(
+            dict_tiebreaks[player]["direct_encounters"]
+        )[1:]
+        dict_tiebreaks[player]["buchholz_cut_1"] = sum(dict_tiebreaks[player]["buchholz_cut_1"])
+
+        # Buchholz
+        dict_tiebreaks[player]["buchholz"] = sum(dict_tiebreaks[player]["direct_encounters"])
+
+        # AROC 1
+        dict_tiebreaks[player]["aroc_1"] = sum(
+            sorted(dict_tiebreaks[player]["opponet_ratings"])[1:]
+        )
+
+    # Sort players by score
+    sorted_results = sorted(
+        dict_tiebreaks.items(),
+        key=lambda x: (
+            x[1]["score"],
+            x[1]["buchholz_cut_1"],
+            x[1]["buchholz"],
+            x[1]["sonnenborn_berger"],
+        ),
+        reverse=True,
+    )
+
+    # Check by direct encounter
+    player1 = sorted_results[0]
+    player2 = sorted_results[1]
+
+    first_and_second_place_tie = True
+    fields_to_check = ["score", "buchholz_cut_1", "buchholz", "sonnenborn_berger"]
+
+    for field in fields_to_check:
+        if player1[1][field] != player2[1][field]:
+            first_and_second_place_tie = False
+            break
+
+    if first_and_second_place_tie:
+        sorted_results = sorted_results
+
+    # Save position
     for i in range(len(sorted_results)):
-        if not current_score:
-            current_score = sorted_results[i]["score"]
+        sorted_results[i][1]["position"] = i + 1
+        sorted_results[i] = sorted_results[i][1]
 
-        sorted_results[i]["position"] = position
-
-        if sorted_results[i]["score"] != current_score:
-            current_score = sorted_results[i]["score"]
-            position += 1
-
+    # Save to Silver_events
     silver_events.insert_one(
         {
             "date_processed": datetime.utcnow(),
             "Event": chess_objects[0]["Event"],
-            "results": results,
+            "date": chess_objects[0]["Date"],
+            "url": chess_objects[0]["url"],
+            "results": sorted_results,
         }
     )
 
@@ -235,6 +324,12 @@ if __name__ == "__main__":
                 results_event.setdefault(chess_object["Black"], 0.5)
                 results_event[chess_object["White"]] += 0.5
                 results_event[chess_object["Black"]] += 0.5
+
+            # Converts the elos to int or 0 if no elos are available
+            chess_object.setdefault("WhiteElo", 0)
+            chess_object.setdefault("BlackElo", 0)
+            chess_object["WhiteElo"] = int(chess_object["WhiteElo"])
+            chess_object["BlackElo"] = int(chess_object["BlackElo"])
 
             chess_objects.append(chess_object)
 
