@@ -2,6 +2,11 @@ import os
 import re
 from datetime import datetime, timezone
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 import pymongo
 from tqdm import tqdm
 
@@ -166,6 +171,25 @@ def save_to_silver_games(chess_objects):
 
 
 def save_to_silver_events(chess_objects, results):
+    array_results = []
+
+    for player in results:
+        array_results.append({"player": player, "score": results[player]})
+
+    sorted_results = sorted(array_results, key=lambda x: x["score"], reverse=True)
+
+    current_score = None
+    position = 1
+    for i in range(len(sorted_results)):
+        if not current_score:
+            current_score = sorted_results[i]["score"]
+
+        sorted_results[i]["position"] = position
+
+        if sorted_results[i]["score"] != current_score:
+            current_score = sorted_results[i]["score"]
+            position += 1
+
     silver_events.insert_one(
         {
             "date_processed": datetime.utcnow(),
@@ -214,8 +238,8 @@ if __name__ == "__main__":
 
             chess_objects.append(chess_object)
 
-        save_to_silver_games(chess_objects)
         save_to_silver_events(chess_objects, results_event)
+        save_to_silver_games(chess_objects)
 
         chess_objects = []
         results_event = {}
