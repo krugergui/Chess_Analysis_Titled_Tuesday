@@ -252,6 +252,10 @@ def save_to_silver_events(chess_objects, results):
             x[1]["buchholz_cut_1"],
             x[1]["buchholz"],
             x[1]["sonnenborn_berger"],
+            x[1]["number_of_wins"],
+            x[1]["number_of_wins_with_black"],
+            x[1]["aroc_1"],
+            x[1]["own_rating"],
         ),
         reverse=True,
     )
@@ -281,7 +285,7 @@ def save_to_silver_events(chess_objects, results):
         {
             "date_processed": datetime.utcnow(),
             "Event": chess_objects[0]["Event"],
-            "date": chess_objects[0]["Date"],
+            "Date": chess_objects[0]["Date"],
             "url": chess_objects[0]["url"],
             "results": sorted_results,
         }
@@ -330,6 +334,9 @@ if __name__ == "__main__":
             chess_object.setdefault("BlackElo", 0)
             chess_object["WhiteElo"] = int(chess_object["WhiteElo"])
             chess_object["BlackElo"] = int(chess_object["BlackElo"])
+
+            # Converts date to datetime
+            chess_object["Date"] = datetime.strptime(chess_object["Date"], "%Y.%m.%d")
 
             chess_objects.append(chess_object)
 

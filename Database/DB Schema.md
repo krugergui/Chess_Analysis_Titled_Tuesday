@@ -20,7 +20,7 @@
 | processed_at     | Time of processing                                                                                                                                  | date             |
 | Event            | Self explanatory                                                                                                                                    | string           |
 | Site             | Which website does this data originate from                                                                                                         | string           |
-| Date             | Self explanatory                                                                                                                                    | string           |
+| Date             | Date that the event/game ocurred                                                                                                                    | dateISO          |
 | Round            | Self explanatory                                                                                                                                    | string           |
 | White            | Player playing white                                                                                                                                | string           |
 | Black            | Player playing black                                                                                                                                | string           |
@@ -41,9 +41,13 @@
 
 ## events
 
-| Column         | Description                                            | Data Type                                                     |
-| -------------- | ------------------------------------------------------ | ------------------------------------------------------------- |
-| \_id           | ID                                                     | ObjectID                                                      |
-| date_processed | Date that the data was processed into the silver table | date                                                          |
-| Event          | Name of the event                                      | string                                                        |
-| results        | How many points did every player achieved              | object with "player name" as keys and "total points" as value |
+| Column         | Description                                               | Data Type                                                                                  |
+| -------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| \_id           | ID                                                        | ObjectID                                                                                   |
+| date_processed | Date that the data was processed into the silver table    | date                                                                                       |
+| Event          | Name of the event                                         | string                                                                                     |
+| results        | How many points did every player achieve and its position | Array of objects with "player" (string), "score" (float) and "position" (int) - See note 1 |
+| Date           | Date that the event/game ocurred                          | dateISO                                                                                    |
+| url            | URL that originated the data                              | string                                                                                     |
+
+Note 1 - For this project there was no consideration to tie breaks, the official Tie Break method is the [**Buchholz cut 1**](https://support.chess.com/en/articles/8572860-how-do-ties-in-tournaments-work)
