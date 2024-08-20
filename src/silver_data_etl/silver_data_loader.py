@@ -33,6 +33,14 @@ logs_db = client.logs
 logs_silver = logs_db.silver
 
 timestamp = datetime.now(timezone.utc)
+players_with_multiple_accounts = {
+    "Hikaru": "Nakamura, Hikaru",
+    "MagnusCarlsen": "Carlsen, Magnus",
+    "Firouzja2003": "Firouzja, Alireza",
+    "mishanick": "Sarana, Alexey",
+    "FairChess_on_YouTube": "Andreikin, Dmitry",
+    "Polish_fighter3000": "Duda, Jan-Krzysztof",
+}
 
 
 def get_move_clock(times):
@@ -148,6 +156,11 @@ def parse_landing_area_document(landing_area_document):
                 chess_object["WhiteElo"], chess_object["BlackElo"] = map(
                     float, (chess_object["WhiteElo"], chess_object["BlackElo"])
                 )
+
+            # Unify players who have multiple accounts in the database
+            for color in ["White", "Black"]:
+                if chess_object[color] in players_with_multiple_accounts.keys():
+                    chess_object[color] = players_with_multiple_accounts[chess_object[color]]
 
             # Yield the completed chess object,
             yield chess_object
