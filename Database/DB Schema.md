@@ -50,4 +50,3 @@
 | Date           | Date that the event/game ocurred                          | dateISO                                                                                    |
 | url            | URL that originated the data                              | string                                                                                     |
 
-Note 1 - For this project there was no consideration to tie breaks, the official Tie Break method is the [**Buchholz cut 1**](https://support.chess.com/en/articles/8572860-how-do-ties-in-tournaments-work)
